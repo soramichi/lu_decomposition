@@ -4,7 +4,7 @@
 
 using namespace std;
 
-#define SIZE 2
+#define SIZE 4
 
 double L[SIZE][SIZE];
 double L_inv[SIZE][SIZE];
@@ -43,16 +43,19 @@ int main(){
 
   print(L);
 
-  for(int n=0; n<SIZE; n++){
-    for(int i=n; i>=0; i--){
-      double numerator = (i==n ? 1 : 0);
+  // for each iteration, calc L_inv[1:subsize][1:subsize],
+  // assuming that L_inv[1:subsize-1][1:subsize-1] is already calculated
+  // useful info: http://www.juen.ac.jp/math/nakagawa/balinalg.pdf
+  for(int subsize=0; subsize<SIZE; subsize++){
+    // calc the last column (j==subsize)
+    for(int i=subsize; i>=0; i--){
+      double numerator = (i==subsize ? 1 : 0);
       
-      for(int j=n; j>=i; j--){
-	numerator += L[i][j] * L_inv[i][j];
+      for(int k=0; k<=subsize; k++){
+	numerator -= L[i][k] * L_inv[k][subsize];;
       }
-      
-      //printf("L[%d][%d] = %.3f\n", i, n, L[i][n]);
-      L_inv[i][n] = numerator / L[i][n];
+
+      L_inv[i][subsize] = numerator / L[i][i];
     }
   }
 
